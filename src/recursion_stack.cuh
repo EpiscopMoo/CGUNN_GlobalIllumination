@@ -33,28 +33,53 @@ float[] render(args){
 
 typedef short unsigned int suint;
 
-struct func_hdr_info
-{
-	float3 mask_value;
-	float3 target_pt;
-	float3 target_dir;
-	__device__ func_hdr_info(float3 _val, float3 _pt, float3 _dir) :
-		mask_value(_val),
-		target_pt(_pt),
-		target_dir(_dir){}
-	__device__ func_hdr_info() :
-		mask_value(make_float3(1.0, 1.0, 1.0)) {}
-};
-
-struct sp_stack //single purpose stack (for recursion)
+struct ray_stack //single purpose stack (for recursion)
 {
 	suint ptr;
-	static const suint depth = 5;
-	func_hdr_info mem[depth];
+	static const suint depth = 10;
+	Ray mem[depth];
 
-	__device__ sp_stack() :
-	ptr(0)
-	{
+	__device__ sp_stack() :	ptr(0) {}
+    __device__ bool push(const Ray& ray)
+    {
+        if (ptr == depth)
+            return false;
+        mem[ptr].orig = ray.orig;
+        mem[ptr].dir = ray.dir;
+        ptr++;
+        return true;
+    }
+    __device__ Ray pop()
+    {
+        ptr--;
+        return Ray(mem[ptr].orig, mem[ptr].dir);
+    }
+    __device__ bool is_not_empty()
+    {
+        return ptr > 0;
+    }
+};
 
-	}
+struct acc_stack //accumulator for recursion
+{
+    suint ptr;
+    static const suint depth = 10;
+    float3 emissions[depth];
+    float3 intencities[depth];
+    __device__ acc_stack() : ptr(0) {}
+    __device__ bool store_emission_and_intencity(float3 emission, float3 intencity)
+    {
+        if (ptr == depth)
+            return false;
+        emissions[ptr] = emission;
+        intencities[ptr] = intencity;
+        ptr++;
+        return true;
+    }
+    __device__ float3 accumulate(float3 value)
+    {
+        for (int i=ptr-1; i>=0; i--)
+            value = emissions[i] + value*intencities[i];
+        return value;
+    }
 };
