@@ -2,6 +2,35 @@
 #include <vector_types.h>
 #include "cutil_math.h"
 
+/*
+Using stack in pseudocode:
+stack -> obviously, stack
+accumulated_values -> emission summand, light intencity multiplier
+
+float[] render(args){
+    stack.push(args);
+    
+    while(stack.is_not_empty()){
+        current_args = stack.pop();
+        results = use_args_in_algorithm(current_args);
+        if (algorith_terminates == true){ //make sure that loop always terminates after finite number of iterations!
+            //results = some value, usually emission from light source
+            break;
+        }
+        //otherwise results consist of emission value, some multiplier value and new args for next bounce
+        accumulated_values.store_emission(results.e);
+        accumulated_values.store_intencity(results.i);
+        stack.push(results.new_args);        
+    }
+    
+    //the loop will always finish with some singular emission value inside 'results' variable
+    while(accumulated_values.not_empty()){
+        result = result * accumulated_values.get_intencity() + accumulated_values.get_emission();
+    }
+}
+
+*/
+
 typedef short unsigned int suint;
 
 struct func_hdr_info
