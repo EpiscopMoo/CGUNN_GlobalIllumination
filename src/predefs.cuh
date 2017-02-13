@@ -9,3 +9,4 @@
 //Scene & rendering
 #define MAX_BOUNCES 8
 #define GRID_CELL_SIZE 12.0f
+#define R_R_ITER_THRESHOLD 4

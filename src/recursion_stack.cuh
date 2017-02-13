@@ -36,7 +36,7 @@ typedef short unsigned int suint;
 struct ray_stack //single purpose stack (for recursion)
 {
 	suint ptr;
-	static const suint depth = 10;
+	static const suint depth = MAX_BOUNCES;
 	Ray mem[depth];
 
 	__device__ sp_stack() :	ptr(0) {}
@@ -63,7 +63,7 @@ struct ray_stack //single purpose stack (for recursion)
 struct acc_stack //accumulator for recursion
 {
     suint ptr;
-    static const suint depth = 10;
+    static const suint depth = MAX_BOUNCES+1;
     float3 emissions[depth];
     float3 intencities[depth];
     __device__ acc_stack() : ptr(0) {}
